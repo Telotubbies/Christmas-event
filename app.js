@@ -13,7 +13,7 @@ const ALIASES = {
   "พู": ["ภู", "phu", "poo"]
 };
 
-const SEED = "XMAS-2025-GROUP-01";
+const SEED = "XMAS-2025-GROUP-02";
 
 // =====================
 // DOM
