@@ -13,26 +13,31 @@ const ALIASES = {
   "พู": ["ภู", "phu", "poo"]
 };
 
-const SEED = "XMAS-2025-GROUP-02";
+const SEED = "XMAS-2025-GROUP-0-"; // เปลี่ยนค่านี้เพื่อเปลี่ยนผลทั้งกลุ่ม
+
+// =====================
+// LOCAL LOCK KEYS (ล็อก “เครื่องนี้”)
+// =====================
+const K_LOCKED_USER = "gift_locked_user";      // เครื่องนี้ล็อกว่าเป็นใคร
+const K_REVEALED    = "gift_revealed_once";    // เครื่องนี้เปิดผลไปแล้วหรือยัง
 
 // =====================
 // DOM
 // =====================
-const loginCard = document.getElementById("loginCard");
-const revealCard = document.getElementById("revealCard");
+const loginCard   = document.getElementById("loginCard");
+const revealCard  = document.getElementById("revealCard");
 const nicknameInput = document.getElementById("nickname");
-const btnLogin = document.getElementById("btnLogin");
-const btnLogout = document.getElementById("btnLogout");
-const btnReveal = document.getElementById("btnReveal");
-const whoEl = document.getElementById("who");
-const slotText = document.getElementById("slotText");
-const resultBox = document.getElementById("result");
-const resultName = document.getElementById("resultName");
-const loginError = document.getElementById("loginError");
+const btnLogin    = document.getElementById("btnLogin");
+const btnLogout   = document.getElementById("btnLogout");
+const btnReveal   = document.getElementById("btnReveal");
+const whoEl       = document.getElementById("who");
+const slotText    = document.getElementById("slotText");
+const resultBox   = document.getElementById("result");
+const resultName  = document.getElementById("resultName");
+const loginError  = document.getElementById("loginError");
 
 let currentUser = null;
 let mapping = null;
-let revealed = false;
 
 // =====================
 // NORMALIZE + DISTANCE
@@ -59,11 +64,7 @@ function levenshtein(a, b){
   for (let i = 1; i <= m; i++){
     for (let j = 1; j <= n; j++){
       const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      dp[i][j] = Math.min(
-        dp[i - 1][j] + 1,
-        dp[i][j - 1] + 1,
-        dp[i - 1][j - 1] + cost
-      );
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
     }
   }
   return dp[m][n];
@@ -77,22 +78,23 @@ function thresholdFor(name){
 }
 
 // =====================
-// HYBRID SEARCH
+// HYBRID SEARCH (Exact -> Alias -> Fuzzy)
+// STRICT_EXACT ต้องพิมพ์ตรงเท่านั้น
 // =====================
 function matchUser(input){
   const raw = (input || "").trim();
   if (!raw) return null;
 
-  // STRICT: ต้องตรงเป๊ะเท่านั้น
+  // STRICT ต้องตรงเป๊ะ
   if (STRICT_EXACT.has(raw)) return raw;
   for (const s of STRICT_EXACT){
     if (normalizeName(s) === normalizeName(raw) && raw !== s) return null;
   }
 
-  // 1) Exact
+  // Exact
   if (PEOPLE.includes(raw)) return raw;
 
-  // 2) Alias
+  // Alias
   const normIn = normalizeName(raw);
   for (const [canonical, list] of Object.entries(ALIASES)){
     if (STRICT_EXACT.has(canonical)) continue;
@@ -102,7 +104,7 @@ function matchUser(input){
     }
   }
 
-  // 3) Fuzzy
+  // Fuzzy
   let best = { name: null, d: Infinity };
   for (const p of PEOPLE){
     if (STRICT_EXACT.has(p)) continue;
@@ -148,7 +150,6 @@ function seededShuffle(arr, seedStr){
   }
   return a;
 }
-
 function buildMapping(){
   const givers = PEOPLE.slice();
   let receivers = seededShuffle(PEOPLE, SEED);
@@ -179,7 +180,7 @@ function buildMapping(){
 }
 
 // =====================
-// UI + EFFECTS
+// UI HELPERS
 // =====================
 function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
@@ -208,24 +209,36 @@ function clearError(){
 
 function setLoggedIn(user){
   currentUser = user;
-  revealed = false;
-  resultBox.hidden = true;
   whoEl.textContent = user;
   loginCard.hidden = true;
   revealCard.hidden = false;
-  slotText.textContent = "พร้อมแล้วกดเลย ✨";
+
+  // ถ้าเครื่องนี้เคยเปิดผลแล้ว: แสดงผลทันทีและล็อกปุ่ม
+  const revealedOnce = localStorage.getItem(K_REVEALED) === "1";
+  if (revealedOnce){
+    const target = mapping[currentUser];
+    slotText.textContent = target;
+    resultName.textContent = target;
+    resultBox.hidden = false;
+
+    btnReveal.disabled = true;
+    btnReveal.textContent = "✅ เปิดไปแล้ว (เครื่องนี้เปิดได้ครั้งเดียว)";
+    btnLogout.disabled = true;
+    btnLogout.style.opacity = "0.6";
+  } else {
+    slotText.textContent = "พร้อมแล้วกดเลย ✨";
+    resultBox.hidden = true;
+
+    btnReveal.disabled = false;
+    btnReveal.textContent = "🎄 เปิดดูผลจับของขวัญ";
+    btnLogout.disabled = true; // กันสลับชื่อแม้ก่อนเปิด
+    btnLogout.style.opacity = "0.6";
+  }
 }
 
-function logout(){
-  currentUser = null;
-  revealed = false;
-  nicknameInput.value = "";
-  clearError();
-  revealCard.hidden = true;
-  loginCard.hidden = false;
-}
-
-// Confetti (canvas)
+// =====================
+// CONFETTI (เดิม)
+// =====================
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
 let confettiPieces = [];
@@ -289,36 +302,63 @@ function animate(){
 }
 
 // =====================
-// INIT + EVENTS
+// INIT
 // =====================
 function init(){
   mapping = buildMapping();
-  const saved = localStorage.getItem("gift_user");
-  if (saved && PEOPLE.includes(saved)) setLoggedIn(saved);
+
+  // ถ้าเครื่องนี้ล็อก user ไว้แล้ว → ข้าม login ทันที
+  const lockedUser = localStorage.getItem(K_LOCKED_USER);
+  if (lockedUser && PEOPLE.includes(lockedUser)){
+    setLoggedIn(lockedUser);
+  } else {
+    // ยังไม่ล็อก: โชว์หน้า login
+    revealCard.hidden = true;
+    loginCard.hidden = false;
+  }
 }
 init();
 
+// =====================
+// EVENTS
+// =====================
 btnLogin.addEventListener("click", () => {
   clearError();
-  const user = matchUser(nicknameInput.value);
-  if (!user){
+  const chosen = matchUser(nicknameInput.value);
+
+  if (!chosen){
     showError("ไม่เจอชื่อนี้ในกลุ่มน้า ลองพิมพ์ใหม่อีกทีได้ไหม 😊");
     return;
   }
-  localStorage.setItem("gift_user", user);
-  setLoggedIn(user);
+
+  // ถ้าเครื่องเคยล็อกแล้ว ห้ามเปลี่ยน
+  const locked = localStorage.getItem(K_LOCKED_USER);
+  if (locked && locked !== chosen){
+    showError(`เครื่องนี้ล็อกไว้แล้วว่าเป็น “${locked}” เลยเปิดดูคนอื่นไม่ได้นะ`);
+    return;
+  }
+
+  // ล็อกเครื่องว่าเป็น user นี้ (เลือกได้ครั้งเดียว)
+  localStorage.setItem(K_LOCKED_USER, chosen);
+  setLoggedIn(chosen);
 });
+
 nicknameInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") btnLogin.click();
 });
-btnLogout.addEventListener("click", () => {
-  localStorage.removeItem("gift_user");
-  logout();
-});
-btnReveal.addEventListener("click", async () => {
-  if (!currentUser || revealed) return;
 
-  revealed = true;
+// ปุ่มออก: ตั้งใจ "ไม่ให้ใช้" เพื่อกันสลับชื่อ
+btnLogout.addEventListener("click", () => {
+  // intentionally disabled by design
+});
+
+btnReveal.addEventListener("click", async () => {
+  if (!currentUser) return;
+
+  // ถ้าเคยเปิดแล้ว: ไม่ให้เปิดซ้ำ
+  const revealedOnce = localStorage.getItem(K_REVEALED) === "1";
+  if (revealedOnce) return;
+
   btnReveal.disabled = true;
 
   const target = mapping[currentUser];
@@ -328,5 +368,11 @@ btnReveal.addEventListener("click", async () => {
   resultBox.hidden = false;
   burstConfetti();
 
-  btnReveal.disabled = false;
+  // ล็อกว่าเครื่องนี้เปิดผลแล้ว (เปิดได้ครั้งเดียว)
+  localStorage.setItem(K_REVEALED, "1");
+
+  btnReveal.disabled = true;
+  btnReveal.textContent = "✅ เปิดไปแล้ว (เครื่องนี้เปิดได้ครั้งเดียว)";
+  btnLogout.disabled = true;
+  btnLogout.style.opacity = "0.6";
 });

@@ -3,27 +3,56 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>🎄 จับของขวัญลับ</title>
+  <title>🎄 Christmas Gift Draw</title>
+
+  <!-- Fonts (ตามที่คุณให้มา) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Itim&family=Lavishly+Yours&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Warm background + subtle patterns -->
   <div class="bg" aria-hidden="true"></div>
 
-  <!-- Decorations -->
-  <div class="top-garland" aria-hidden="true"></div>
+  <!-- Garland + blinking lights -->
+  <div class="garland" aria-hidden="true">
+    <div class="garland-wire"></div>
+    <div class="bulbs">
+      <span class="bulb red"></span><span class="bulb gold"></span><span class="bulb green"></span>
+      <span class="bulb gold"></span><span class="bulb red"></span><span class="bulb green"></span>
+      <span class="bulb red"></span><span class="bulb gold"></span><span class="bulb green"></span>
+      <span class="bulb gold"></span><span class="bulb red"></span><span class="bulb green"></span>
+      <span class="bulb red"></span><span class="bulb gold"></span><span class="bulb green"></span>
+      <span class="bulb gold"></span><span class="bulb red"></span><span class="bulb green"></span>
+    </div>
+  </div>
 
-  <!-- Stars (top corners) -->
-  <div class="stars stars-left" aria-hidden="true"></div>
-  <div class="stars stars-right" aria-hidden="true"></div>
+  <!-- Falling big stars -->
+  <div class="falling-stars" aria-hidden="true">
+    <div class="big-star s1"></div>
+    <div class="big-star s2"></div>
+    <div class="big-star s3"></div>
+    <div class="big-star s4"></div>
+    <div class="big-star s5"></div>
+  </div>
 
-  <!-- Christmas trees (bottom corners) -->
+  <!-- Corner trees -->
   <div class="tree tree-left" aria-hidden="true"></div>
   <div class="tree tree-right" aria-hidden="true"></div>
 
+  <!-- Bottom gifts -->
+  <div class="gift-row" aria-hidden="true">
+    <div class="gift g1"><i></i><b></b></div>
+    <div class="gift g2"><i></i><b></b></div>
+    <div class="gift g3"><i></i><b></b></div>
+    <div class="gift g4"><i></i><b></b></div>
+  </div>
+
   <main class="wrap">
     <header class="hero">
-      <div class="badge">CHRISTMAS GIFT EXCHANGE</div>
+      <div class="badge">CHRISTMAS EVENT</div>
+      <div class="eng-topic">Secret Gift Draw</div>
       <h1>จับของขวัญลับ 🎁</h1>
       <p class="sub">พิมพ์ชื่อเล่นของตัวเอง แล้วกดดูเลยว่าเราต้องให้ของขวัญใคร</p>
     </header>
@@ -68,7 +97,7 @@
       </div>
 
       <div class="result" id="result" hidden>
-        <div class="resultTitle">ของขวัญของเราต้องไปหา…</div>
+        <div class="resultTitle">เราต้องให้ของขวัญกับ</div>
         <div class="resultName" id="resultName"></div>
         <div class="note">ชู่วว เก็บไว้เป็นความลับนะ 🤫</div>
       </div>
