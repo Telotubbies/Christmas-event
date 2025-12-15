@@ -222,7 +222,7 @@ function setLoggedIn(user){
     resultBox.hidden = false;
 
     btnReveal.disabled = true;
-    btnReveal.textContent = "✅ เปิดไปแล้ว (เครื่องนี้เปิดได้ครั้งเดียว)";
+    btnReveal.textContent = "✅ เปิดไปแล้ว (เปิดได้ครั้งเดียว)";
     btnLogout.disabled = true;
     btnLogout.style.opacity = "0.6";
   } else {
