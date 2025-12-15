@@ -354,5 +354,5 @@ btnReveal.addEventListener("click", async () => {
   localStorage.setItem(K_REVEALED, "1");
 
   btnReveal.disabled = true;
-  btnReveal.textContent = `✅ เปิดไปแล้ว ห: ${target}`;
+  btnReveal.textContent = `✅ เปิดไปแล้ว : ${target}`;
 });
