@@ -45,7 +45,7 @@ body{
 /* Layout */
 .wrap{
   width:min(980px, 92vw);
-  margin:88px auto 26px; /* เผื่อพวงไฟ */
+  margin:88px auto 26px;
   position:relative;
   z-index:2;
 }
@@ -139,6 +139,7 @@ input:focus{
   transition: transform .08s ease, filter .2s ease;
 }
 .btn:active{transform: translateY(1px) scale(.99)}
+.btn:disabled{cursor:not-allowed; filter:saturate(.8);}
 
 .btn.primary{
   color:#fff;
@@ -154,10 +155,24 @@ input:focus{
 
 .btn.big{
   width:100%;
-  height:62px;
+  height:72px;          /* ให้เหมือนกล่องสุ่ม */
   font-size:18px;
-  border-radius:20px;
+  border-radius:22px;
+  position:relative;
+  overflow:hidden;
 }
+
+/* เงาวิบวับบนปุ่มเหมือน slot */
+.btn.big::after{
+  content:"";
+  position:absolute;
+  inset:-60%;
+  background: conic-gradient(from 0deg, transparent, rgba(244,201,93,.18), transparent, rgba(47,158,102,.12), transparent);
+  animation: spin 4.5s linear infinite;
+  opacity:.8;
+}
+.btn.big > *{ position:relative; } /* กันข้อความทับ layer */
+@keyframes spin { to { transform: rotate(360deg);} }
 
 /* Cute note */
 .cute-note{
@@ -203,35 +218,6 @@ input:focus{
 .small{font-size:14px;color:var(--muted); font-weight:800}
 .who{font-size:22px;font-weight:1000}
 
-.slot{
-  margin:16px 0;
-  height:98px;
-  border-radius:22px;
-  border:2px dashed rgba(47,158,102,.45);
-  background:
-    radial-gradient(600px 160px at 50% 0%, rgba(244,201,93,.22) 0%, transparent 60%),
-    #fff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  position:relative;
-  overflow:hidden;
-}
-.slot::after{
-  content:"";
-  position:absolute; inset:-60%;
-  background: conic-gradient(from 0deg, transparent, rgba(244,201,93,.16), transparent, rgba(217,75,75,.14), transparent);
-  animation: spin 4.5s linear infinite;
-}
-.slotText{
-  position:relative;
-  font-size:24px;
-  font-weight:1000;
-  color:#1c2b22;
-  text-shadow: 0 8px 18px rgba(0,0,0,.08);
-}
-@keyframes spin { to { transform: rotate(360deg);} }
-
 .actions{display:flex}
 
 /* Result */
@@ -268,9 +254,7 @@ input:focus{
   z-index:1;
 }
 
-/* ======================
-   Garland + blinking bulbs
-   ====================== */
+/* ========== Garland + blinking bulbs ========== */
 .garland{
   position:fixed;
   top:0; left:0; right:0;
@@ -324,9 +308,7 @@ input:focus{
   50%{ transform: translateY(1px); opacity: 1; filter: brightness(1.18); }
 }
 
-/* ======================
-   Falling Big Stars
-   ====================== */
+/* ========== Falling Big Stars ========== */
 .falling-stars{
   position:fixed;
   inset:0;
@@ -346,7 +328,7 @@ input:focus{
   filter: drop-shadow(0 16px 24px rgba(0,0,0,.25));
   animation: fall 9.5s linear infinite;
 }
-.big-star.s1{ left: 8%;  animation-delay: 0s;   }
+.big-star.s1{ left: 8%;  animation-delay: 0s; }
 .big-star.s2{ left: 28%; animation-delay: 2.2s; }
 .big-star.s3{ left: 52%; animation-delay: 4.3s; }
 .big-star.s4{ left: 72%; animation-delay: 1.3s; }
@@ -358,9 +340,7 @@ input:focus{
   100% { transform: translateY(calc(100vh + 160px)) translateX(-60px) rotate(220deg); opacity:0; }
 }
 
-/* ======================
-   Corner Trees
-   ====================== */
+/* ========== Corner Trees ========== */
 .tree{
   position:fixed;
   bottom:-6px;
@@ -404,9 +384,7 @@ input:focus{
   filter: drop-shadow(0 -22px 0 #2f9e66) drop-shadow(0 -44px 0 #166244);
 }
 
-/* ======================
-   Bottom gift boxes
-   ====================== */
+/* ========== Bottom gift boxes ========== */
 .gift-row{
   position:fixed;
   left:50%;
@@ -479,84 +457,28 @@ input:focus{
     width: min(940px, 94vw);
   }
 
-  .badge{
-    font-size: 11px;
-    padding: 6px 12px;
-  }
+  .badge{ font-size: 11px; padding: 6px 12px; }
 
-  .eng-topic{
-    font-size: 40px;
-    line-height: 1;
-    margin: 2px 0 4px;
-  }
+  .eng-topic{ font-size: 40px; margin: 2px 0 4px; }
+  h1{ font-size: 30px; margin: 6px 0 6px; }
+  .sub{ font-size: 15px; line-height: 1.35; padding: 0 6px; }
 
-  h1{
-    font-size: 30px;
-    margin: 6px 0 6px;
-  }
-  .sub{
-    font-size: 15px;
-    line-height: 1.35;
-    padding: 0 6px;
-  }
-
-  .card{
-    padding: 16px;
-    border-radius: 18px;
-    margin: 12px auto;
-  }
-
+  .card{ padding: 16px; border-radius: 18px; margin: 12px auto; }
   h2{ font-size: 20px; }
   .label{ font-size: 15px; }
 
-  .row{
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  input{
-    width: 100%;
-    height: 50px;
-    font-size: 17px;
-    border-radius: 16px;
-  }
-  .btn{
-    width: 100%;
-    height: 50px;
-    border-radius: 16px;
-  }
-  .btn.big{
-    height: 56px;
-    border-radius: 18px;
-    font-size: 17px;
-  }
+  .row{ flex-direction: column; gap: 10px; margin-top: 10px; }
+  input{ width: 100%; height: 50px; font-size: 17px; border-radius: 16px; }
 
-  .cute-note{
-    font-size: 17px;
-    margin-top: 12px;
-  }
-  .names{
-    font-size: 13px;
-    margin-top: 12px;
-  }
-  .names code{
-    display: inline-block;
-    margin-top: 6px;
-    line-height: 1.6;
-  }
+  .btn{ width: 100%; height: 50px; border-radius: 16px; }
+  .btn.big{ height: 62px; border-radius: 18px; font-size: 17px; }
 
-  .slot{
-    height: 88px;
-    border-radius: 18px;
-  }
-  .slotText{
-    font-size: 20px;
-  }
-  .resultName{
-    font-size: 32px;
-  }
+  .cute-note{ font-size: 17px; margin-top: 12px; }
+  .names{ font-size: 13px; margin-top: 12px; }
+  .names code{ display:inline-block; margin-top:6px; line-height:1.6; }
 
-  /* Decorations: ลดรก ไม่ทับ UI */
+  .resultName{ font-size: 32px; }
+
   .garland{ height: 74px; }
   .garland-wire{ top: 30px; }
   .bulbs{ top: 28px; padding: 0 10px; }
@@ -564,36 +486,17 @@ input:focus{
   .bulb::before{ width: 9px; height: 5px; top: -5px; }
   .bulb:nth-child(4n){ display:none; }
 
-  .big-star{
-    width: 52px;
-    height: 52px;
-    opacity: .45;
-    animation-duration: 11.5s;
-  }
+  .big-star{ width: 52px; height: 52px; opacity: .45; animation-duration: 11.5s; }
+  .tree{ width: 120px; height: 170px; opacity: .65; bottom: -18px; }
 
-  .tree{
-    width: 120px;
-    height: 170px;
-    opacity: .65;
-    bottom: -18px;
-  }
-
-  .gift-row{
-    bottom: 10px;
-    gap: 10px;
-    opacity: .85;
-  }
-  .gift{
-    width: 34px;
-    height: 34px;
-    border-radius: 9px;
-  }
+  .gift-row{ bottom: 10px; gap: 10px; opacity: .85; }
+  .gift{ width: 34px; height: 34px; border-radius: 9px; }
   .gift i{ height: 34px; width: 8px; }
   .gift b{ width: 34px; height: 8px; }
   .gift::after{ top: -9px; width: 20px; height: 12px; }
 }
 
-/* มือถือเล็กมาก (กันทับจอ) */
+/* จอเล็กมาก */
 @media (max-width:380px){
   .wrap{ margin-top: 64px; }
   .eng-topic{ font-size: 36px; }

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>🎄 Christmas Gift Draw</title>
 
-  <!-- Fonts (ตามที่คุณให้มา) -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Itim&family=Lavishly+Yours&display=swap" rel="stylesheet">
@@ -54,7 +54,7 @@
       <div class="badge">CHRISTMAS EVENT</div>
       <div class="eng-topic">Secret Gift Draw</div>
       <h1>จับของขวัญลับ 🎁</h1>
-      <p class="sub">พิมพ์ชื่อเล่นของตัวเอง แล้วกดดูเลยว่าเราต้องให้ของขวัญใคร</p>
+      <p class="sub">พิมพ์ชื่อเล่นของตัวเอง แล้วกดปุ่มเดียวเพื่อเปิดดูผล</p>
     </header>
 
     <section class="card" id="loginCard">
@@ -68,7 +68,7 @@
 
       <p class="cute-note">
         พิมพ์ชื่อของตัวเองได้เลยน้า 💖<br>
-        😊
+        พิมพ์พลาดนิดหน่อยไม่เป็นไร เราช่วยเดาให้ 😊
       </p>
 
       <div class="error" id="loginError" hidden></div>
@@ -85,19 +85,18 @@
           <div class="small">ผู้เล่น</div>
           <div class="who" id="who"></div>
         </div>
-        <button id="btnLogout" class="btn ghost">ออก</button>
-      </div>
-
-      <div class="slot">
-        <div class="slotText" id="slotText">พร้อมแล้วกดเลย ✨</div>
+        <button id="btnLogout" class="btn ghost" title="ล็อกไว้เพื่อกันสลับชื่อ">ออก</button>
       </div>
 
       <div class="actions">
-        <button id="btnReveal" class="btn primary big">🎄 เปิดดูผลจับของขวัญ</button>
+        <!-- ปุ่มเดียว: slot + reveal -->
+        <button id="btnReveal" class="btn primary big">
+          🎄 เปิดดูผลจับของขวัญ
+        </button>
       </div>
 
       <div class="result" id="result" hidden>
-        <div class="resultTitle">เราต้องให้ของขวัญกับ</div>
+        <div class="resultTitle">ของขวัญของเราต้องไปหา…</div>
         <div class="resultName" id="resultName"></div>
         <div class="note">ชู่วว เก็บไว้เป็นความลับนะ 🤫</div>
       </div>

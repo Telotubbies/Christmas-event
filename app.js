@@ -2,7 +2,7 @@
 // DATA
 // =====================
 const PEOPLE = ["เอก", "เคน", "แอล", "ปุยฝ้าย", "กานต์", "กาญ", "ปอเปี๊ยะ", "พู"];
-const STRICT_EXACT = new Set(["กาญ", "กานต์"]); // ต้องพิมพ์ตรงเป๊ะเท่านั้น
+const STRICT_EXACT = new Set(["กาญ", "กานต์"]);
 
 const ALIASES = {
   "เอก": ["เอกก", "เอกๆ"],
@@ -13,13 +13,13 @@ const ALIASES = {
   "พู": ["ภู", "phu", "poo"]
 };
 
-const SEED = "XMAS-2025-GROUP-0-"; // เปลี่ยนค่านี้เพื่อเปลี่ยนผลทั้งกลุ่ม
+const SEED = "XMAS-2025-GROUP-0-";
 
 // =====================
-// LOCAL LOCK KEYS (ล็อก “เครื่องนี้”)
+// LOCAL LOCK (เครื่องนี้เท่านั้น)
 // =====================
-const K_LOCKED_USER = "gift_locked_user";      // เครื่องนี้ล็อกว่าเป็นใคร
-const K_REVEALED    = "gift_revealed_once";    // เครื่องนี้เปิดผลไปแล้วหรือยัง
+const K_LOCKED_USER = "gift_locked_user";
+const K_REVEALED    = "gift_revealed_once";
 
 // =====================
 // DOM
@@ -31,7 +31,6 @@ const btnLogin    = document.getElementById("btnLogin");
 const btnLogout   = document.getElementById("btnLogout");
 const btnReveal   = document.getElementById("btnReveal");
 const whoEl       = document.getElementById("who");
-const slotText    = document.getElementById("slotText");
 const resultBox   = document.getElementById("result");
 const resultName  = document.getElementById("resultName");
 const loginError  = document.getElementById("loginError");
@@ -43,16 +42,10 @@ let mapping = null;
 // NORMALIZE + DISTANCE
 // =====================
 function normalizeName(s){
-  return (s || "")
-    .trim()
-    .replace(/\s+/g, "")
-    .replace(/[“”"']/g, "")
-    .toLowerCase();
+  return (s || "").trim().replace(/\s+/g, "").replace(/[“”"']/g, "").toLowerCase();
 }
-
 function levenshtein(a, b){
-  a = normalizeName(a);
-  b = normalizeName(b);
+  a = normalizeName(a); b = normalizeName(b);
   const m = a.length, n = b.length;
   if (m === 0) return n;
   if (n === 0) return m;
@@ -69,7 +62,6 @@ function levenshtein(a, b){
   }
   return dp[m][n];
 }
-
 function thresholdFor(name){
   const len = normalizeName(name).length;
   if (len <= 2) return 1;
@@ -78,23 +70,19 @@ function thresholdFor(name){
 }
 
 // =====================
-// HYBRID SEARCH (Exact -> Alias -> Fuzzy)
-// STRICT_EXACT ต้องพิมพ์ตรงเท่านั้น
+// HYBRID MATCH
 // =====================
 function matchUser(input){
   const raw = (input || "").trim();
   if (!raw) return null;
 
-  // STRICT ต้องตรงเป๊ะ
   if (STRICT_EXACT.has(raw)) return raw;
   for (const s of STRICT_EXACT){
     if (normalizeName(s) === normalizeName(raw) && raw !== s) return null;
   }
 
-  // Exact
   if (PEOPLE.includes(raw)) return raw;
 
-  // Alias
   const normIn = normalizeName(raw);
   for (const [canonical, list] of Object.entries(ALIASES)){
     if (STRICT_EXACT.has(canonical)) continue;
@@ -104,7 +92,6 @@ function matchUser(input){
     }
   }
 
-  // Fuzzy
   let best = { name: null, d: Infinity };
   for (const p of PEOPLE){
     if (STRICT_EXACT.has(p)) continue;
@@ -113,8 +100,7 @@ function matchUser(input){
   }
   if (!best.name) return null;
 
-  const t = thresholdFor(best.name);
-  return best.d <= t ? best.name : null;
+  return best.d <= thresholdFor(best.name) ? best.name : null;
 }
 
 // =====================
@@ -167,7 +153,6 @@ function buildMapping(){
     receivers = seededShuffle(receivers, `${SEED}-try-${attempt}`);
   }
 
-  // fallback fix
   for (let i = 0; i < givers.length; i++){
     if (givers[i] === receivers[i]){
       const j = (i + 1) % receivers.length;
@@ -182,22 +167,6 @@ function buildMapping(){
 // =====================
 // UI HELPERS
 // =====================
-function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
-
-async function slotMachineReveal(finalName){
-  const pool = PEOPLE.slice();
-  const rounds = 26;
-  slotText.textContent = "กำลังสุ่มให้น้า…";
-  for (let i = 0; i < rounds; i++){
-    const pick = pool[Math.floor(Math.random() * pool.length)];
-    slotText.textContent = pick;
-    slotText.style.transform = `translateY(${(Math.random()*6-3).toFixed(1)}px)`;
-    await sleep(55 + i * 10);
-  }
-  slotText.style.transform = "translateY(0)";
-  slotText.textContent = finalName;
-}
-
 function showError(msg){
   loginError.hidden = false;
   loginError.textContent = msg;
@@ -206,38 +175,58 @@ function clearError(){
   loginError.hidden = true;
   loginError.textContent = "";
 }
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+/* SLOT EFFECT IN BUTTON */
+async function slotInButton(finalName){
+  const pool = PEOPLE.slice();
+  const rounds = 26;
+
+  const original = btnReveal.textContent;
+  btnReveal.textContent = "กำลังสุ่มให้น้า…";
+
+  for (let i = 0; i < rounds; i++){
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    btnReveal.textContent = `🎁 ${pick}`;
+    await sleep(55 + i * 10);
+  }
+
+  btnReveal.textContent = `🎄 ${finalName}`;
+  return original;
+}
 
 function setLoggedIn(user){
   currentUser = user;
   whoEl.textContent = user;
+
   loginCard.hidden = true;
   revealCard.hidden = false;
 
-  // ถ้าเครื่องนี้เคยเปิดผลแล้ว: แสดงผลทันทีและล็อกปุ่ม
   const revealedOnce = localStorage.getItem(K_REVEALED) === "1";
+  const target = mapping[currentUser];
+
   if (revealedOnce){
-    const target = mapping[currentUser];
-    slotText.textContent = target;
+    // ถ้าเปิดไปแล้ว: แสดงผลและปิดทุกอย่าง
     resultName.textContent = target;
     resultBox.hidden = false;
 
     btnReveal.disabled = true;
-    btnReveal.textContent = "✅ เปิดไปแล้ว (เปิดได้ครั้งเดียว)";
+    btnReveal.textContent = `✅ เปิดไปแล้ว : ${target}`;
     btnLogout.disabled = true;
     btnLogout.style.opacity = "0.6";
   } else {
-    slotText.textContent = "พร้อมแล้วกดเลย ✨";
+    // ยังไม่เปิด: ใช้ปุ่มเดียว
     resultBox.hidden = true;
 
     btnReveal.disabled = false;
     btnReveal.textContent = "🎄 เปิดดูผลจับของขวัญ";
-    btnLogout.disabled = true; // กันสลับชื่อแม้ก่อนเปิด
+    btnLogout.disabled = true;
     btnLogout.style.opacity = "0.6";
   }
 }
 
 // =====================
-// CONFETTI (เดิม)
+// CONFETTI
 // =====================
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
@@ -307,12 +296,10 @@ function animate(){
 function init(){
   mapping = buildMapping();
 
-  // ถ้าเครื่องนี้ล็อก user ไว้แล้ว → ข้าม login ทันที
   const lockedUser = localStorage.getItem(K_LOCKED_USER);
   if (lockedUser && PEOPLE.includes(lockedUser)){
     setLoggedIn(lockedUser);
   } else {
-    // ยังไม่ล็อก: โชว์หน้า login
     revealCard.hidden = true;
     loginCard.hidden = false;
   }
@@ -331,14 +318,12 @@ btnLogin.addEventListener("click", () => {
     return;
   }
 
-  // ถ้าเครื่องเคยล็อกแล้ว ห้ามเปลี่ยน
   const locked = localStorage.getItem(K_LOCKED_USER);
   if (locked && locked !== chosen){
     showError(`เครื่องนี้ล็อกไว้แล้วว่าเป็น “${locked}” เลยเปิดดูคนอื่นไม่ได้นะ`);
     return;
   }
 
-  // ล็อกเครื่องว่าเป็น user นี้ (เลือกได้ครั้งเดียว)
   localStorage.setItem(K_LOCKED_USER, chosen);
   setLoggedIn(chosen);
 });
@@ -347,32 +332,27 @@ nicknameInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") btnLogin.click();
 });
 
-// ปุ่มออก: ตั้งใจ "ไม่ให้ใช้" เพื่อกันสลับชื่อ
-btnLogout.addEventListener("click", () => {
-  // intentionally disabled by design
-});
+// intentionally disabled (กันสลับชื่อ)
+btnLogout.addEventListener("click", () => {});
 
 btnReveal.addEventListener("click", async () => {
   if (!currentUser) return;
 
-  // ถ้าเคยเปิดแล้ว: ไม่ให้เปิดซ้ำ
   const revealedOnce = localStorage.getItem(K_REVEALED) === "1";
   if (revealedOnce) return;
 
   btnReveal.disabled = true;
 
   const target = mapping[currentUser];
-  await slotMachineReveal(target);
+
+  await slotInButton(target);
 
   resultName.textContent = target;
   resultBox.hidden = false;
   burstConfetti();
 
-  // ล็อกว่าเครื่องนี้เปิดผลแล้ว (เปิดได้ครั้งเดียว)
   localStorage.setItem(K_REVEALED, "1");
 
   btnReveal.disabled = true;
-  btnReveal.textContent = "✅ เปิดไปแล้ว (เครื่องนี้เปิดได้ครั้งเดียว)";
-  btnLogout.disabled = true;
-  btnLogout.style.opacity = "0.6";
+  btnReveal.textContent = `✅ เปิดไปแล้ว: ${target}`;
 });
