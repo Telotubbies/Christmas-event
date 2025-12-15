@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>🎄 จับของขวัญลับ</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Warm background + subtle patterns -->
+  <div class="bg" aria-hidden="true"></div>
+
+  <!-- Decorations -->
+  <div class="top-garland" aria-hidden="true"></div>
+
+  <!-- Stars (top corners) -->
+  <div class="stars stars-left" aria-hidden="true"></div>
+  <div class="stars stars-right" aria-hidden="true"></div>
+
+  <!-- Christmas trees (bottom corners) -->
+  <div class="tree tree-left" aria-hidden="true"></div>
+  <div class="tree tree-right" aria-hidden="true"></div>
+
+  <main class="wrap">
+    <header class="hero">
+      <div class="badge">CHRISTMAS GIFT EXCHANGE</div>
+      <h1>จับของขวัญลับ 🎁</h1>
+      <p class="sub">พิมพ์ชื่อเล่นของตัวเอง แล้วกดดูเลยว่าเราต้องให้ของขวัญใคร</p>
+    </header>
+
+    <section class="card" id="loginCard">
+      <h2>มาเล่นกันเถอะ</h2>
+      <label class="label" for="nickname">ชื่อเล่นของเรา</label>
+
+      <div class="row">
+        <input id="nickname" type="text" placeholder="เช่น เอก / เคน / แอล / ปุยฝ้าย ..." autocomplete="off" />
+        <button id="btnLogin" class="btn primary">เริ่มเลย</button>
+      </div>
+
+      <p class="cute-note">
+        พิมพ์ชื่อของตัวเองได้เลยน้า 💖<br>
+        😊
+      </p>
+
+      <div class="error" id="loginError" hidden></div>
+
+      <div class="names">
+        <span>เพื่อนในกลุ่ม:</span>
+        <code>เอก เคน แอล ปุยฝ้าย กานต์ กาญ ปอเปี๊ยะ พู</code>
+      </div>
+    </section>
+
+    <section class="card" id="revealCard" hidden>
+      <div class="topline">
+        <div>
+          <div class="small">ผู้เล่น</div>
+          <div class="who" id="who"></div>
+        </div>
+        <button id="btnLogout" class="btn ghost">ออก</button>
+      </div>
+
+      <div class="slot">
+        <div class="slotText" id="slotText">พร้อมแล้วกดเลย ✨</div>
+      </div>
+
+      <div class="actions">
+        <button id="btnReveal" class="btn primary big">🎄 เปิดดูผลจับของขวัญ</button>
+      </div>
+
+      <div class="result" id="result" hidden>
+        <div class="resultTitle">ของขวัญของเราต้องไปหา…</div>
+        <div class="resultName" id="resultName"></div>
+        <div class="note">ชู่วว เก็บไว้เป็นความลับนะ 🤫</div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      ขอให้สนุก อบอุ่น และได้ของขวัญถูกใจ 🎅✨
+    </footer>
+  </main>
+
+  <canvas id="confetti" aria-hidden="true"></canvas>
+  <script src="app.js"></script>
+</body>
+</html>
